@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: addresses-api
+  namespace: default
+  labels:
+    app: addresses-api
+    tier: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: addresses-api
+  template:
+    metadata:
+      labels:
+        app: addresses-api
+        tier: backend
+    spec:
+      containers:
+      - name: addresses-api
+        image: dagairacr.azurecr.io/dagair-addresses:develop-1.1.0-alpha0061-4c96619
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: Kubernetes
+        - name: ASPNETCORE_URLS
+          value: "http://+"
+        - name: ConnectionStrings__DagAir.Addresses
+          value: "server=someserver;database=someschema;user=someuser;password=somepassword;SslMode=Required;SslCa=DigiCertGlobalRootCA.crt.pem"
+        - name: basePath
+          value: "/addresses"
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: addresses-api
+  namespace: default
+  labels:
+    app: addresses-api
+    tier: backend
+spec:
+  selector:
+    app: addresses-api
+  type: LoadBalancer
+  ports:
+  - port: 8094
+    targetPort: 80
+    protocol: TCP
+    name: http

@@ -1,0 +1,8 @@
+apiVersion: image.toolkit.fluxcd.io/v1beta1
+kind: ImageRepository
+metadata:
+  name: addresses
+  namespace: flux-system
+spec:
+  image: dagairacr.azurecr.io/dagair-addresses
+  interval: 1m0s
